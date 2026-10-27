@@ -29,24 +29,19 @@
       cursor: not-allowed;
     }
 
-    .pulse-lock {
-      animation: pulse 1.5s infinite;
-    }
+    .pulse-lock { animation: pulse 1.5s infinite; }
     @keyframes pulse {
       0% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 5px #FFD700; }
       50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 20px #FFD700; }
       100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 5px #FFD700; }
     }
 
-    .float-envelope {
-      animation: floating 3s ease-in-out infinite;
-    }
+    .float-envelope { animation: floating 3s ease-in-out infinite; }
     @keyframes floating {
       0% { transform: translateY(0px); }
       50% { transform: translateY(-12px); }
       100% { transform: translateY(0px); }
     }
-    /* 為 7 個紅包設定延遲 */
     .delay-1 { animation-delay: 0s; }
     .delay-2 { animation-delay: 0.2s; }
     .delay-3 { animation-delay: 0.4s; }
@@ -54,6 +49,7 @@
     .delay-5 { animation-delay: 0.8s; }
     .delay-6 { animation-delay: 1.0s; }
     .delay-7 { animation-delay: 1.2s; }
+    .delay-8 { animation-delay: 1.4s; }
 
     /* 抽獎箱動畫設定 */
     .ball-bounce { animation: bounce 0.6s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5); }
@@ -74,6 +70,10 @@
     .flip-card {
       perspective: 1000px;
       height: 170px;
+      /* 固定卡片寬度，讓 flex-wrap 能夠完美計算折行 */
+      width: 100%;
+      max-width: 260px;
+      flex-shrink: 0;
     }
     .flip-card-inner {
       position: relative;
@@ -83,9 +83,8 @@
       transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
       transform-style: preserve-3d;
     }
-    .flip-card.flipped .flip-card-inner {
-      transform: rotateY(180deg);
-    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    
     .flip-card-front, .flip-card-back {
       position: absolute;
       width: 100%;
@@ -120,7 +119,6 @@
       position: relative;
     }
     
-    /* Stamp 徽章設計 */
     .stamp-badge {
       position: absolute;
       top: -8px;
@@ -139,22 +137,20 @@
     }
     .stamp-1st { background: linear-gradient(135deg, #ef4444, #b91c1c); }
     .stamp-2nd { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stamp-backup { background: linear-gradient(135deg, #059669, #047857); } /* 備取專用綠色標籤 */
   </style>
 </head>
 <body class="text-white relative flex flex-col min-h-screen">
 
-  <!-- ================= 抽獎動畫遮罩 (預設隱藏) ================= -->
+  <!-- 動畫遮罩 -->
   <div id="loadingOverlay" class="fixed inset-0 z-50 flex-col items-center justify-center bg-black/85 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
     <div class="relative w-40 h-40 mb-6">
-      <!-- 彈跳彩球 -->
       <div class="absolute bottom-12 left-6 w-8 h-8 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-600 shadow-lg ball-bounce b-delay-1 flex items-center justify-center"><span class="text-[10px] font-bold text-red-900">獎</span></div>
       <div class="absolute bottom-12 left-16 w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-red-600 shadow-lg ball-bounce b-delay-2 flex items-center justify-center"><span class="text-[10px] font-bold text-white">抽</span></div>
       <div class="absolute bottom-12 right-6 w-8 h-8 rounded-full bg-gradient-to-br from-blue-300 to-blue-600 shadow-lg ball-bounce b-delay-3 flex items-center justify-center"><span class="text-[10px] font-bold text-white">中</span></div>
-      <!-- 震動抽獎箱 -->
       <div class="absolute bottom-0 w-full h-20 bg-gradient-to-b from-red-700 to-red-900 border-4 border-yellow-500 rounded-b-xl flex items-center justify-center box-shake shadow-[0_0_20px_rgba(255,215,0,0.4)] z-10">
         <span class="text-yellow-400 font-bold tracking-widest text-lg drop-shadow-md">抽獎箱</span>
       </div>
-      <!-- 抽獎箱開口陰影 -->
       <div class="absolute bottom-20 w-full h-4 bg-black/60 rounded-full blur-sm box-shake z-0"></div>
     </div>
     <h3 class="text-2xl font-bold text-yellow-400 animate-pulse tracking-widest drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">連線洗牌中，請稍候...</h3>
@@ -162,27 +158,26 @@
 
   <header class="w-full pt-8 px-4 flex justify-center mb-8">
     <div class="w-full md:w-4/5 max-w-6xl flex items-center justify-center">
-      <!-- 加入 onerror 容錯機制，無論副檔名是 .jpg 還是 .png 還是 .PNG 都能抓到 -->
       <img src="banner.jpg" onerror="this.onerror=null; this.src='banner.png'; this.onerror=function(){this.src='Banner.PNG'}" alt="2026花蓮購物節活動Banner" class="w-full h-auto object-contain drop-shadow-2xl rounded-xl">
     </div>
   </header>
 
-  <!-- 7 個進度節點 (包含 3.5 億) -->
+  <!-- 8 個進度節點 -->
   <section class="max-w-6xl mx-auto w-full px-4 mb-10">
     <div class="bg-black/50 rounded-full p-4 sm:p-6 flex justify-between items-center relative shadow-inner overflow-hidden">
       <div class="absolute left-8 right-8 top-1/2 h-2 bg-yellow-500 -z-10 transform -translate-y-1/2 rounded-full"></div>
       <script>
-        const milestones = ['5,000萬', '1億元', '1.5億元', '2億元', '2.5億元', '3億元', '3.5億元'];
+        const milestones = ['5,000萬', '1億元', '1.5億元', '2億元', '2.5億元', '3億元', '3.5億元', '4億元'];
         milestones.forEach(m => {
           document.write(`
             <div class="flex flex-col items-center z-10">
-              <div class="w-8 h-8 sm:w-12 sm:h-12 bg-red-700 border-2 border-yellow-500 rounded-full flex items-center justify-center mb-1 sm:mb-2 pulse-lock bg-gradient-to-br from-red-500 to-red-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-7 h-7 sm:w-10 sm:h-10 bg-red-700 border-2 border-yellow-500 rounded-full flex items-center justify-center mb-1 sm:mb-2 pulse-lock bg-gradient-to-br from-red-500 to-red-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-5 sm:w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span class="text-yellow-400 font-bold text-xs sm:text-sm tracking-wider bg-black/70 px-1 sm:px-2 py-0.5 sm:py-1 rounded-full border border-yellow-600/50 hidden sm:block">${m}</span>
-              <span class="text-yellow-400 font-bold text-[10px] bg-black/70 px-1 py-0.5 rounded-full sm:hidden">${m.replace('元','').replace('萬','W')}</span>
+              <span class="text-yellow-400 font-bold text-xs tracking-wider bg-black/70 px-1 sm:px-2 py-0.5 rounded-full border border-yellow-600/50 hidden sm:block">${m}</span>
+              <span class="text-yellow-400 font-bold text-[9px] bg-black/70 px-1 py-0.5 rounded-full sm:hidden">${m.replace('元','').replace('萬','W')}</span>
             </div>
           `);
         });
@@ -196,15 +191,15 @@
     </button>
   </section>
 
-  <!-- 待機紅包 7 個 -->
-  <section id="preDrawEnvelopes" class="max-w-6xl mx-auto w-full px-2 md:px-4 mb-12 flex flex-nowrap justify-between gap-1 sm:gap-4 transition-opacity duration-500">
+  <!-- 上 4 下 4 網格佈局紅包 -->
+  <section id="preDrawEnvelopes" class="max-w-3xl mx-auto w-full px-4 mb-12 grid grid-cols-4 gap-4 sm:gap-6 justify-items-center transition-opacity duration-500">
     <script>
-      const envTexts = ['5仟萬<br>加碼獎', '1億<br>加碼獎', '1.5億<br>加碼獎', '2億<br>加碼獎', '2.5億<br>加碼獎', '3億<br>加碼獎', '3.5億<br>加碼獎'];
+      const envTexts = ['5仟萬<br>加碼獎', '1億<br>加碼獎', '1.5億<br>加碼獎', '2億<br>加碼獎', '2.5億<br>加碼獎', '3億<br>加碼獎', '3.5億<br>加碼獎', '4億<br>加碼獎'];
       envTexts.forEach((text, i) => {
         document.write(`
-          <div class="flex-1 max-w-[140px] aspect-[2/3] bg-gradient-to-br from-red-600 to-red-800 rounded-lg border-2 border-yellow-400 flex items-center justify-center shadow-2xl float-envelope delay-${i+1}">
+          <div class="w-full max-w-[140px] aspect-[2/3] bg-gradient-to-br from-red-600 to-red-800 rounded-lg border-2 border-yellow-400 flex items-center justify-center shadow-2xl float-envelope delay-${i+1}">
             <div class="w-full h-full border-2 border-dashed border-yellow-500/50 m-1 md:m-1.5 flex flex-col items-center justify-center rounded p-1 text-center">
-              <span class="text-yellow-400 text-[10px] sm:text-base md:text-xl font-bold leading-tight tracking-wider drop-shadow-md">${text}</span>
+              <span class="text-yellow-400 text-xs sm:text-base md:text-lg font-bold leading-tight tracking-wider drop-shadow-md">${text}</span>
             </div>
           </div>
         `);
@@ -212,18 +207,17 @@
     </script>
   </section>
 
-  <section id="resultsContainer" class="max-w-6xl mx-auto w-full px-4 grid grid-cols-1 gap-8 hidden pb-10">
-    <!-- JS 將會在此動態插入獎項區塊 -->
+  <!-- 結果容器 -->
+  <section id="resultsContainer" class="max-w-7xl mx-auto w-full px-4 flex flex-col gap-8 hidden pb-10">
+    <!-- JS 動態插入獎項區塊 -->
   </section>
 
   <div class="mt-auto">
     <footer class="text-center pb-8 text-sm text-yellow-100/80 tracking-wide">
       <p>正式中獎名單將公告於花蓮購物節官方網站</p>
-      <!-- 更新為花蓮縣政府廣告 -->
-      <p class="mt-1">相關訊息以官方網站公告為準。 | 花蓮縣政府廣告</p>
+      <p class="mt-1">相關訊息以官方網站公告為準。 | 花蓮縣政府</p>
     </footer>
 
-    <!-- 極遠距離的重置按鈕 -->
     <div class="mt-32 mb-4 pr-4 flex justify-end">
       <button id="resetBtn" class="bg-black/30 hover:bg-black/60 text-yellow-600/40 hover:text-yellow-500 border border-yellow-600/30 hover:border-yellow-500/50 px-2 py-1 rounded text-[10px] cursor-pointer transition-all duration-300 flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -235,7 +229,6 @@
   </div>
 
   <script>
-    // 真實 GAS API 網址
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwpWTLXzBymoza2PIHS9Cik9azcvMfTSTMFeSh7bA6bBu5WYni2JuZUQFj7xCpvrFzr/exec';
 
     const drawBtn = document.getElementById('drawBtn');
@@ -246,7 +239,9 @@
     
     let timeoutIds = [];
     
-    // 7 個獎項門檻配置
+    // 用於記錄全域狀態
+    let appState = []; 
+
     const prizeTiersConfig = [
       { name: '5仟萬元 加碼獎', param: '5000萬' },
       { name: '1億元 加碼獎', param: '1億' },
@@ -254,7 +249,8 @@
       { name: '2億元 加碼獎', param: '2億' },
       { name: '2.5億元 加碼獎', param: '2.5億' },
       { name: '3億元 加碼獎', param: '3億' },
-      { name: '3.5億元 加碼獎', param: '3.5億' }
+      { name: '3.5億元 加碼獎', param: '3.5億' },
+      { name: '4億元 加碼獎', param: '4億' }
     ];
 
     const prizeData = [
@@ -264,19 +260,17 @@
       { label: '參獎 10,000', class: '' }
     ];
 
-    // 姓名遮蔽
     function maskName(name) {
       if (!name) return '未知';
       if (name.length <= 2) return name.charAt(0) + 'Ｏ';
       return name.charAt(0) + 'Ｏ' + name.charAt(name.length - 1);
     }
 
-    // 電話遮蔽
     function maskPhone(phone) {
       if (!phone) return '未知';
       let pStr = String(phone).trim();
       
-      // 防呆：修復 Google Sheet 把開頭 0 吃掉的問題 (例如 966685800 自動補回 0966685800)
+      // 防呆：如果號碼只有 9 碼且開頭是 9，自動補 0
       if (pStr.length === 9 && pStr.startsWith('9')) {
         pStr = '0' + pStr;
       }
@@ -284,8 +278,6 @@
       if (pStr.length >= 10) {
         return `${pStr.substring(0, 4)}-XXX${pStr.substring(pStr.length - 3)}`;
       }
-      
-      // 強制容錯：就算號碼長度真的很奇怪，也要確保有遮蔽，絕不露出原碼
       if (pStr.length > 4) {
         const mid = Math.floor(pStr.length / 2);
         return `${pStr.substring(0, mid - 1)}XXX${pStr.substring(mid + 2)}`;
@@ -294,22 +286,124 @@
       return pStr;
     }
     
-    // 顯示 Loading 動畫
     function showLoading() {
       loadingOverlay.classList.remove('hidden');
       loadingOverlay.style.display = 'flex';
-      setTimeout(() => {
-        loadingOverlay.classList.remove('opacity-0');
-      }, 10);
+      setTimeout(() => loadingOverlay.classList.remove('opacity-0'), 10);
     }
 
-    // 隱藏 Loading 動畫
     function hideLoading() {
       loadingOverlay.classList.add('opacity-0');
       setTimeout(() => {
         loadingOverlay.classList.add('hidden');
         loadingOverlay.style.display = 'none';
       }, 300);
+    }
+
+    // 建立卡片 DOM 元素 (支援正取與備取標籤)
+    function createCardHTML(winner, prizeInfo, isFlipped = false) {
+      const safeName = maskName(winner.name);
+      const safePhone = maskPhone(winner.phone);
+      const safeId = winner.id || '無編號';
+      const safeStore = winner.store || '未知店家';
+      const flippedClass = isFlipped ? 'flipped' : '';
+
+      return `
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="w-full h-full flex flex-col items-center justify-center border-4 border-double border-yellow-500/70 rounded-xl m-1">
+              <span class="golden-text">抽</span>
+            </div>
+          </div>
+          <div class="flip-card-back rounded-xl">
+            <div class="stamp-badge ${prizeInfo.class}">${prizeInfo.label}</div>
+            <div class="flex flex-col h-full w-full justify-between items-center py-2 px-1">
+              <div class="text-xs text-gray-500 font-mono bg-gray-100 rounded px-2 py-1">${safeId}</div>
+              <div class="text-center my-auto">
+                <div class="text-xl font-bold text-red-700 mb-1 tracking-widest">${safeName}</div>
+                <div class="text-sm font-bold text-gray-800 tracking-wider">${safePhone}</div>
+              </div>
+              <div class="w-full text-xs text-yellow-900 bg-yellow-100/80 rounded border border-yellow-300 px-2 py-1.5 truncate text-center">
+                📍 ${safeStore}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 全局重複比對邏輯 (更新警告UI)
+    function checkDuplicatesAndUpdateUI() {
+      const allDisplayed = [];
+      // 收集目前顯示在畫面上的所有中獎者
+      appState.forEach(tier => {
+        for (let i = 0; i < tier.renderedCount; i++) {
+          const w = tier.winners[i];
+          let pStr = String(w.phone).trim();
+          if (pStr.length === 9 && pStr.startsWith('9')) pStr = '0' + pStr; // 標準化
+          
+          allDisplayed.push({ 
+            key: pStr + '_' + w.name, 
+            tierIndex: tier.tierIndex 
+          });
+        }
+      });
+
+      // 找出出現大於1次的 key
+      const keyCounts = {};
+      allDisplayed.forEach(item => {
+        keyCounts[item.key] = (keyCounts[item.key] || 0) + 1;
+      });
+
+      // 將有重複的 tierIndex 記錄下來
+      const duplicateTierIndices = new Set();
+      allDisplayed.forEach(item => {
+        if (keyCounts[item.key] > 1) {
+          duplicateTierIndices.add(item.tierIndex);
+        }
+      });
+
+      // 更新畫面 UI (顯示或隱藏警告標語與備取按鈕)
+      appState.forEach(tier => {
+        const warningEl = document.getElementById(`warning-${tier.tierIndex}`);
+        const backupBtn = document.getElementById(`backup-btn-${tier.tierIndex}`);
+        
+        if (duplicateTierIndices.has(tier.tierIndex)) {
+          warningEl.classList.remove('hidden');
+          backupBtn.classList.remove('hidden');
+        } else {
+          warningEl.classList.add('hidden');
+          backupBtn.classList.add('hidden');
+        }
+      });
+    }
+
+    // 抽出備取者 (往右邊加牌)
+    function drawBackup(tierIndex) {
+      const tier = appState[tierIndex];
+      
+      // 如果備取名單用完
+      if (tier.renderedCount >= tier.winners.length) {
+        alert("該獎項備取名單已用盡！");
+        return;
+      }
+
+      // 取出下一位備取
+      const backupWinner = tier.winners[tier.renderedCount];
+      tier.renderedCount++;
+
+      const cardsGrid = document.getElementById(`grid-${tierIndex}`);
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'flip-card flipped'; // 備取直接顯示正面
+      
+      // 備取統一給予「備取名額」標籤
+      const backupPrizeInfo = { label: '備取名額', class: 'stamp-backup' };
+      cardDiv.innerHTML = createCardHTML(backupWinner, backupPrizeInfo, true);
+      
+      cardsGrid.appendChild(cardDiv);
+      
+      // 新增後再次進行全域比對
+      checkDuplicatesAndUpdateUI();
     }
 
     drawBtn.addEventListener('click', async function() {
@@ -320,93 +414,73 @@
       
       resultsContainer.innerHTML = '';
       resultsContainer.classList.remove('hidden');
+      appState = []; // 清空狀態
 
-      // 開啟抽獎箱全螢幕動畫
       showLoading();
 
       try {
-        // 並發 7 個請求加速資料抓取，務必加入 redirect: 'follow' 來處理 GAS 的跨域轉址
         const fetchPromises = prizeTiersConfig.map(tier => 
           fetch(`${GAS_API_URL}?level=${encodeURIComponent(tier.param)}`, {
             method: 'GET',
             redirect: 'follow'
           })
-            .then(res => {
-              if (!res.ok) throw new Error(`API 伺服器回應錯誤 (HTTP ${res.status})`);
-              return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
               if(data.error) throw new Error(`${tier.name} 發生錯誤: ${data.error}`);
-              if(!Array.isArray(data) || data.length === 0) {
-                throw new Error(`${tier.name} 無法取得抽獎名單，請確認試算表內是否有資料。`);
-              }
               return { tierName: tier.name, winners: data };
             })
         );
 
         const allResults = await Promise.all(fetchPromises);
         
-        // 成功取得所有資料，關閉 loading 動畫
         hideLoading();
         this.innerText = '開獎中...';
 
         allResults.forEach((result, tierIndex) => {
-          if(result.winners.error) {
-            console.error(`${result.tierName} 發生錯誤:`, result.winners.error);
-            return;
-          }
+          // 初始化狀態記錄 (記錄 15 名得主，目前顯示 4 名)
+          appState.push({
+            tierIndex: tierIndex,
+            tierName: result.tierName,
+            winners: result.winners,
+            renderedCount: Math.min(4, result.winners.length) // 預設顯示前4
+          });
 
           const sectionDiv = document.createElement('div');
           sectionDiv.className = 'bg-black/40 p-6 rounded-2xl border border-yellow-500/40 shadow-lg';
           
+          // 標題區：加入隱藏的警告字眼與按鈕
           const titleHTML = `
-            <div class="flex items-center mb-6">
-              <div class="w-2 h-8 bg-yellow-400 mr-3 rounded-full"></div>
-              <h2 class="text-2xl text-yellow-400 font-bold tracking-wider">${result.tierName}</h2>
+            <div class="flex items-center flex-wrap gap-3 mb-6">
+              <div class="flex items-center">
+                <div class="w-2 h-8 bg-yellow-400 mr-3 rounded-full"></div>
+                <h2 class="text-2xl text-yellow-400 font-bold tracking-wider">${result.tierName}</h2>
+              </div>
+              <span id="warning-${tierIndex}" class="hidden text-red-400 text-sm font-bold bg-red-900/50 px-3 py-1 rounded-full border border-red-500 animate-pulse">
+                ⚠️ 可能有重複中獎者，請確認
+              </span>
+              <button id="backup-btn-${tierIndex}" onclick="drawBackup(${tierIndex})" class="hidden bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-1 px-4 rounded-full shadow-lg transition-transform hover:scale-105 border border-green-300">
+                抽出備取者
+              </button>
             </div>
           `;
           
+          // 使用 flex-wrap 讓卡片可以自然往右附加並折行
           const cardsGrid = document.createElement('div');
-          cardsGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
+          cardsGrid.id = `grid-${tierIndex}`;
+          cardsGrid.className = 'flex flex-wrap gap-6 justify-start';
           
           sectionDiv.innerHTML = titleHTML;
           sectionDiv.appendChild(cardsGrid);
           resultsContainer.appendChild(sectionDiv);
 
-          result.winners.forEach((winner, winnerIndex) => {
+          // 初始渲染前 4 名
+          for (let winnerIndex = 0; winnerIndex < appState[tierIndex].renderedCount; winnerIndex++) {
+            const winner = result.winners[winnerIndex];
             const cardDiv = document.createElement('div');
             cardDiv.className = 'flip-card';
             
             const prizeInfo = prizeData[winnerIndex];
-            const safeName = maskName(winner.name);
-            const safePhone = maskPhone(winner.phone);
-            const safeId = winner.id || '無編號';
-            const safeStore = winner.store || '未知店家';
-
-            cardDiv.innerHTML = `
-              <div class="flip-card-inner">
-                <div class="flip-card-front">
-                  <div class="w-full h-full flex flex-col items-center justify-center border-4 border-double border-yellow-500/70 rounded-xl m-1">
-                    <span class="golden-text">抽</span>
-                  </div>
-                </div>
-                <div class="flip-card-back rounded-xl">
-                  <!-- Stamp 徽章標示 -->
-                  <div class="stamp-badge ${prizeInfo.class}">${prizeInfo.label}</div>
-                  
-                  <div class="flex flex-col h-full w-full justify-between items-center py-2 px-1">
-                    <div class="text-xs text-gray-500 font-mono bg-gray-100 rounded px-2 py-1">${safeId}</div>
-                    <div class="text-center my-auto">
-                      <div class="text-xl font-bold text-red-700 mb-1 tracking-widest">${safeName}</div>
-                      <div class="text-sm font-bold text-gray-800 tracking-wider">${safePhone}</div>
-                    </div>
-                    <div class="w-full text-xs text-yellow-900 bg-yellow-100/80 rounded border border-yellow-300 px-2 py-1.5 truncate text-center">
-                      📍 ${safeStore}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `;
+            cardDiv.innerHTML = createCardHTML(winner, prizeInfo);
             cardsGrid.appendChild(cardDiv);
 
             const totalCardIndex = (tierIndex * 4) + winnerIndex;
@@ -416,26 +490,24 @@
               cardDiv.classList.add('flipped');
             }, delay); 
             timeoutIds.push(tId);
-          });
+          }
         });
 
-        const totalCards = 7 * 4;
+        const totalCards = 8 * 4;
         const totalAnimationTime = (totalCards * 150) + 500 + 800; 
         
+        // 動畫結束後，解鎖按鈕並執行「全局重複比對」
         const btnTid = setTimeout(() => {
           drawBtn.innerText = '開獎完成';
           resetBtn.style.pointerEvents = 'auto';
+          checkDuplicatesAndUpdateUI();
         }, totalAnimationTime);
         timeoutIds.push(btnTid);
 
       } catch (error) {
-        // 發生錯誤，關閉 loading 動畫
         hideLoading();
-        
         alert('【抽獎程序中斷】\n' + error.message + '\n\n請檢查 Google Sheet 格式或聯繫系統管理員。');
-        console.error('[真實 API 錯誤]', error);
         
-        // 發生錯誤，將畫面與按鈕還原為初始狀態
         this.disabled = false;
         this.innerText = '立即抽獎';
         preDrawEnvelopes.classList.remove('hidden');
@@ -448,6 +520,7 @@
     resetBtn.addEventListener('click', function() {
       timeoutIds.forEach(id => clearTimeout(id));
       timeoutIds = [];
+      appState = [];
 
       resultsContainer.classList.add('hidden');
       resultsContainer.innerHTML = '';
